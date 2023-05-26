@@ -11,6 +11,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BookController = void 0;
 const controller_1 = require("../base/controller");
+const enum_1 = require("./../utility/enum");
+const enum_2 = require("./../utility/enum");
+const MaxImageSize = 10000; // 10kb
 class BookController {
     constructor(bookService) {
         this.bookService = bookService;
@@ -41,6 +44,15 @@ class BookController {
         });
         this.updateBook = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const book = req.body;
+            const bookImage = book.base64image;
+            if (Buffer.byteLength(bookImage, "base64") > MaxImageSize) {
+                return controller_1.baseController.sendResult(res, {
+                    code: enum_2.HttpStatusCode.BadRequest,
+                    key: enum_1.ErrorCode.BadRequest,
+                    error: "Image size must be less than 10kb.",
+                    result: null,
+                });
+            }
             return this.bookService
                 .updateBook(book)
                 .then((result) => {
@@ -52,6 +64,15 @@ class BookController {
         });
         this.createBook = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const book = req.body;
+            const bookImage = book.base64image;
+            if (Buffer.byteLength(bookImage, "base64") > MaxImageSize) {
+                return controller_1.baseController.sendResult(res, {
+                    code: enum_2.HttpStatusCode.BadRequest,
+                    key: enum_1.ErrorCode.BadRequest,
+                    error: "Image size must be less than 10kb.",
+                    result: null,
+                });
+            }
             return this.bookService
                 .createBook(book)
                 .then((result) => {
