@@ -84,9 +84,28 @@ export class UserRepository {
   public updateUser = async (
     userDetails: UserModel
   ): Promise<Result<UserModel | null>> => {
+    const oldUser = await User.findOne({ id: userDetails.id });
+    if (userDetails.email === "admin@tatvasoft.com" || oldUser.roleId === 1) {
+      return new Result({
+        code: HttpStatusCode.Forbidden,
+        error:
+          "You can not edit admin's credinetial. Please try with you personal account.",
+        key: ErrorCode.Forbidden,
+        result: null,
+      });
+    }
+
     const userRole = roles.find((r) => r.id === userDetails.roleId);
-    const roleId = userRole ? userDetails.roleId : roles[1].id;
-    const role = userRole ? userRole.name : roles[1].name;
+    const roleId = userRole
+      ? userDetails.roleId
+      : oldUser.roleId === 1
+      ? 1
+      : roles[0].id;
+    const role = userRole
+      ? userRole.name
+      : oldUser.roleId === 1
+      ? "admin"
+      : roles[0].name;
     return User.findOneAndUpdate(
       { id: userDetails.id },
       { ...userDetails, role, roleId }

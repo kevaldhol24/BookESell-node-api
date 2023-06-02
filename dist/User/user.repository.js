@@ -29,9 +29,26 @@ class UserRepository {
             });
         });
         this.updateUser = (userDetails) => __awaiter(this, void 0, void 0, function* () {
+            const oldUser = yield User_1.default.findOne({ id: userDetails.id });
+            if (userDetails.email === "admin@tatvasoft.com" || oldUser.roleId === 1) {
+                return new resultModel_1.Result({
+                    code: enum_1.HttpStatusCode.Forbidden,
+                    error: "You can not edit admin's credinetial. Please try with you personal account.",
+                    key: enum_1.ErrorCode.Forbidden,
+                    result: null,
+                });
+            }
             const userRole = constants_1.roles.find((r) => r.id === userDetails.roleId);
-            const roleId = userRole ? userDetails.roleId : constants_1.roles[1].id;
-            const role = userRole ? userRole.name : constants_1.roles[1].name;
+            const roleId = userRole
+                ? userDetails.roleId
+                : oldUser.roleId === 1
+                    ? 1
+                    : constants_1.roles[0].id;
+            const role = userRole
+                ? userRole.name
+                : oldUser.roleId === 1
+                    ? "admin"
+                    : constants_1.roles[0].name;
             return User_1.default.findOneAndUpdate({ id: userDetails.id }, Object.assign(Object.assign({}, userDetails), { role, roleId }))
                 .then((result) => {
                 return new resultModel_1.Result({
