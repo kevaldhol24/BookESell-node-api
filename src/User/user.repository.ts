@@ -195,6 +195,15 @@ export class UserRepository {
   };
 
   public async deleteUser(userId: number): Promise<Result<boolean>> {
+    if (userId === 1 || userId === 2) {
+      return new Result({
+        code: HttpStatusCode.Forbidden,
+        error: "You are not authorized to delete this user. 🤣🤣",
+        key: ErrorCode.Forbidden,
+        result: null,
+      });
+    }
+
     try {
       // Check if the user with the specified ID exists
       const user = await User.findOne({ id: userId });

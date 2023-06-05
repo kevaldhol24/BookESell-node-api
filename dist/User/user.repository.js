@@ -188,6 +188,14 @@ class UserRepository {
     }
     deleteUser(userId) {
         return __awaiter(this, void 0, void 0, function* () {
+            if (userId === 1 || userId === 2) {
+                return new resultModel_1.Result({
+                    code: enum_1.HttpStatusCode.Forbidden,
+                    error: "You are not authorized to delete this user. 🤣🤣",
+                    key: enum_1.ErrorCode.Forbidden,
+                    result: null,
+                });
+            }
             try {
                 // Check if the user with the specified ID exists
                 const user = yield User_1.default.findOne({ id: userId });
